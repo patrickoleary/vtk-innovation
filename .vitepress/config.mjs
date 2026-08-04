@@ -6,6 +6,7 @@ export default defineConfig({
     'Accelerating Community-Driven Medical Innovation with VTK (NIH 2R01EB014955-09)',
   base: '/vtk-innovation/',
   ignoreDeadLinks: true,
+  srcExclude: ['README.md'],
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },

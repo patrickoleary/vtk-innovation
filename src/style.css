@@ -1,0 +1,35 @@
+:root {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  color: #213547;
+  background-color: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #1a1a2e;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+main {
+  max-width: 640px;
+  padding: 4rem 1.5rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+code {
+  background: rgba(128, 128, 128, 0.2);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}

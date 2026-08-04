@@ -23,8 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# local content not part of site
-Aim-1/
-vtk2026/
-index.md
-.DS_Store
+# VitePress
+.vitepress/cache
+.vitepress/dist

@@ -60,6 +60,31 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Aim 2 Topic Reports',
+        items: [
+          {
+            text: 'AI transfer functions',
+            collapsed: true,
+            items: [
+              { text: 'Blog', link: '/Aim-2/tf/blog' },
+              { text: 'Executive summary', link: '/Aim-2/tf/summary' },
+              { text: 'Short report', link: '/Aim-2/tf/short' },
+              { text: 'Detailed report', link: '/Aim-2/tf/detailed' },
+            ],
+          },
+          {
+            text: 'AI-Data',
+            collapsed: true,
+            items: [
+              { text: 'Blog', link: '/Aim-2/data/blog' },
+              { text: 'Executive summary', link: '/Aim-2/data/summary' },
+              { text: 'Short report', link: '/Aim-2/data/short' },
+              { text: 'Detailed report', link: '/Aim-2/data/detailed' },
+            ],
+          },
+        ],
+      },
+      {
         text: 'Community Activities',
         items: [
           {

@@ -13,7 +13,7 @@ The project's overarching purpose is to enhance human life and reduce morbidity 
 
 VTK already serves as core infrastructure for widely used research and clinical applications, including 3D Slicer, ParaView, OsiriX, MITK, SCIRun, MeVisLab, PLUS, and commercial surgical-guidance and biomechanical-analysis systems. The VTK Innovation project builds on that foundation through three interconnected aims: make visualization available everywhere, integrate visualization and artificial intelligence, and make VTK easier to learn and use.
 
-> **Collection scope:** The documents currently assembled in this folder primarily report **Aim 1: Ubiquitous Visual Analytics**. This index places that work in the context of the complete three-aim project and summarizes the prior-year accomplishments recorded in [VTK Innovation.pdf](./VTK%20Innovation.pdf).
+> **Collection scope:** The documents currently assembled in this folder report **Aim 1: Ubiquitous Visual Analytics** and the two technical thrusts of **Aim 2: AI-Ready Visualization**. This index places that work in the context of the complete three-aim project and summarizes the prior-year accomplishments recorded in [VTK Innovation.pdf](./VTK%20Innovation.pdf).
 
 ## The three-aim program
 
@@ -76,9 +76,9 @@ The [VTK Innovation presentation](./VTK%20Innovation.pdf) records a common accom
 
 The prior-year presentation also highlights the team's contribution to VTK 9.5.x. That release cycle adopted C++17 and improved rendering, data handling, cross-language development, tests, continuous integration, and documentation. Notable work included `vtkFastLabeledDataMapper`, `vtkGridAxesActor3D`, improved physically based lighting, expanding WebGPU support, GPU-memory tools, NetCDF enhancements, a memory-stream GLTF importer, multi-touch gestures, modular shaders, and the `vtkHardwareWindow` abstraction. NIH-supported WebAssembly, WebGPU, and JavaScript infrastructure formed part of that foundation.
 
-## Current collection: Aim 1
+## Current report collections
 
-The present folder develops the Aim 1 story in depth. It covers the engineering required to make VTK portable, browser-capable, data-flexible, testable, and accessible to existing Python and web communities.
+The present folder develops Aim 1 in depth and adds the first parallel Aim 2 collection. Aim 1 covers the engineering required to make VTK portable, browser-capable, data-flexible, testable, and accessible to existing Python and web communities. Aim 2 covers AI-assisted transfer-function design and VTK data products for understanding AI behavior.
 
 ### Start here
 
@@ -92,6 +92,23 @@ Each topic is organized into four standalone forms: a blog in the project's pref
 | **VTK WebGPU** | [Blog](./Aim-1/vtk-webgpu/blog.md) · [Executive summary](./Aim-1/vtk-webgpu/summary.md) · [Short report](./Aim-1/vtk-webgpu/short.md) · [Detailed report](./Aim-1/vtk-webgpu/detailed.md) | Portable modern rendering across native and browser environments; window/rendering separation; mapper, shader, render-pass, testing, and migration work. |
 | **Fides and Conduit** | [Blog](./Aim-1/fides/blog.md) · [Executive summary](./Aim-1/fides/summary.md) · [Short report](./Aim-1/fides/short.md) · [Detailed report](./Aim-1/fides/detailed.md) | Schema-driven, in-memory data ingestion for simulations, experiments, Python, and AI outputs. |
 | **trame-vtklocal** | [Blog](./Aim-1/trame-vtklocal/blog.md) · [Executive summary](./Aim-1/trame-vtklocal/summary.md) · [Short report](./Aim-1/trame-vtklocal/short.md) · [Detailed report](./Aim-1/trame-vtklocal/detailed.md) | Python/trame adoption layer for VTK-WASM and WebGPU; scene mirroring, interaction, lifecycle, export, and end-to-end browser testing. |
+
+### Aim 2 topic reports
+
+The Aim 2 collection uses the same four-document structure. Jaswant Panchumarti is the principal technical lead for Aim 2. The two thrusts have different current status: AI transfer-function development continued through 2026, while major AI-Data work is planned to resume later in 2027.
+
+| Topic | Documents | Aim 2 contribution and status |
+|---|---|---|
+| **AI transfer functions** | [Blog](./Aim-2/tf/blog.md) · [Executive summary](./Aim-2/tf/summary.md) · [Short report](./Aim-2/tf/short.md) · [Detailed report](./Aim-2/tf/detailed.md) · [Experiment slides](./AI-TF-slides.pdf) | Transfers a known visualization between registered MRI volumes by learning from corresponding rendered 2D crops. The 2026 trame/VTK-WASM prototype uses separate scalar-color/opacity and gradient-opacity networks, a blended L1/SSIM objective, and 256-point ParaView/Slicer export. |
+| **AI-Data** | [Blog](./Aim-2/data/blog.md) · [Executive summary](./Aim-2/data/summary.md) · [Short report](./Aim-2/data/short.md) · [Detailed report](./Aim-2/data/detailed.md) | Creates saliency, sensitivity, and uncertainty data that VTK can display in anatomical context. The prior-year datasets and trame prototype form the current baseline; major new implementation is deferred until later in 2027. |
+
+#### AI transfer-function experiment highlight
+
+The documented scanner-transfer experiment uses a segmented GE 3T brain MRI and an eight-control-point, hand-authored 3D Slicer `.vp` transfer function as the reference. A Philips 3T scan from a different subject and vendor is rigidly registered to the same grid. Random axes, interior slices, and aligned square crops provide training samples without paired voxel labels: the target supplies normalized scalar intensity and gradient magnitude, while the reference supplies rendered RGB, scalar-opacity, and gradient-opacity channels.
+
+`TransferFunctionNet` uses two pointwise Fourier-feature branches. `ColorOpacityNet` maps scalar intensity to RGB and scalar alpha; `GradientOpacityNet` maps gradient magnitude to gradient alpha. Training blends 20% L1 with 80% structural similarity to preserve local tissue boundaries. The documented run used Adam at `1e-3`, `ReduceLROnPlateau`, two epochs of 1,024 sampled slices, and batches of 16. It exported a 256-point lookup table as ParaView JSON or Slicer `.vp`.
+
+The experiment provides a visible baseline and progression. Linear intensity remapping assigned tissue classes incorrectly; the untrained network produced a flat green output; tissue structure emerged during training; and after two epochs the learned Philips rendering recovered the reference's cyan background and blue, red, and yellow tissue organization. The result demonstrates pairwise transfer between registered volumes, not a generalized pretrained inference model.
 
 ### Community Activities
 
@@ -125,4 +142,4 @@ Together, the aims are intended to reshape how VTK-based tools are built, shared
 
 ---
 
-**Current collection status:** Aim 1 source material and reports through August 2026. Aim 2 and Aim 3 are introduced here from the full-project presentation but do not yet have equivalent document collections in this folder.
+**Current collection status:** Aim 1 source material and reports through August 2026; Aim 2 source material, 2026 meeting evidence, and parallel AI-TF and AI-Data report collections. Aim 3 is introduced from the full-project presentation but does not yet have an equivalent document collection in this folder.

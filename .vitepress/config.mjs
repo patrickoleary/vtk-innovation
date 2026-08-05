@@ -10,7 +10,6 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Aim 1 Reports', link: '/#aim-1-topic-reports' },
     ],
     sidebar: [
       { text: 'Overview', link: '/' },

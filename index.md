@@ -12,8 +12,6 @@ The collection combines prior-year reports, 2026 implementation evidence, meetin
 
 The prior reporting period established the foundation for all three aims. Aim 1 produced browser-native VTK work, WebGPU and hardware-window abstractions, and memory-oriented data pathways. Aim 2 demonstrated learned transfer functions and spatial representations of AI explainability and uncertainty. Aim 3 assembled VTK-specific retrieval, API checking, structured prompt chains, VTK-Prompt, and conversational trame experiments. VTK 9.5.x supplied the shared software-engineering foundation.
 
-The main prior-year sources are [VTK Innovation.pdf](./VTK%20Innovation.pdf), [VTK Innovation Highlights.pdf](./VTK%20Innovation%20Highlights.pdf), and [RPPR-NIH-2025.pdf](./RPPR-NIH-2025.pdf).
-
 ## Aim 1: Ubiquitous Visual Analytics
 
 ### VTK-WASM

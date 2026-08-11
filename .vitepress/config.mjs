@@ -84,6 +84,41 @@ export default defineConfig({
         ],
       },
       {
+        text: 'Aim 3 Topic Reports',
+        items: [
+          {
+            text: 'VTK-Prompt',
+            collapsed: true,
+            items: [
+              { text: 'Blog', link: '/Aim-3/vtk-prompt/blog' },
+              { text: 'Executive summary', link: '/Aim-3/vtk-prompt/summary' },
+              { text: 'Short report', link: '/Aim-3/vtk-prompt/short' },
+              { text: 'Detailed report', link: '/Aim-3/vtk-prompt/detailed' },
+            ],
+          },
+          {
+            text: 'VTK-MCP and VTK RAG',
+            collapsed: true,
+            items: [
+              { text: 'Blog', link: '/Aim-3/vtk-mcp/blog' },
+              { text: 'Executive summary', link: '/Aim-3/vtk-mcp/summary' },
+              { text: 'Short report', link: '/Aim-3/vtk-mcp/short' },
+              { text: 'Detailed report', link: '/Aim-3/vtk-mcp/detailed' },
+            ],
+          },
+          {
+            text: 'VTK ontology, DSL, and knowledge graphs',
+            collapsed: true,
+            items: [
+              { text: 'Blog', link: '/Aim-3/vtk-ontology/blog' },
+              { text: 'Executive summary', link: '/Aim-3/vtk-ontology/summary' },
+              { text: 'Short report', link: '/Aim-3/vtk-ontology/short' },
+              { text: 'Detailed report', link: '/Aim-3/vtk-ontology/detailed' },
+            ],
+          },
+        ],
+      },
+      {
         text: 'Community Activities',
         items: [
           {

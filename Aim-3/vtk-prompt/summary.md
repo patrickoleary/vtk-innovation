@@ -1,0 +1,11 @@
+# Executive Summary
+
+VTK-Prompt is Aim 3's user-facing environment for turning natural-language requests into editable, executable VTK Python visualizations. During 2026 it advanced from an early command-line and trame prototype into a three-panel workspace that combines conversation history, generated code, and live rendering. Each conversation now owns its messages, code, console output, and scene, which supports concurrent generation without stale results appearing in the wrong session.
+
+The updated authoring environment adds Monaco editing, Jedi-backed completion and hover information from VTK docstrings, per-conversation capture of standard output and errors, and dataset discovery across VTK's data collection and uploaded files. A resolver can suggest likely files, replace an unresolved reference, and rerun the program. Generated code is constrained from opening native render windows or corrupting the embedded scene.
+
+A new thinking stage converts a request into a DSL-like description of filters, parameters, and outputs before generation. VTK-Prompt can use the separate `vtk-mcp` service for API facts, example retrieval, code validation, and DSL translation. It also parses textual tool calls produced by local or quantized models that do not implement native tool calling. Optional tool logs and a debug transcript make injected context and tool use inspectable.
+
+This architecture consolidates earlier work on VTK-Prompt, VTK RAG, API-MCP, and the Sequential Thinking Pipeline while preserving a clean boundary: VTK-Prompt is the interactive client; VTK knowledge, retrieval, and validation are services. `trame-llm` remains a related path for controlling registered functions in an existing application by language or voice.
+
+The result is a stronger foundation for AI-supported learning and authoring, not a guarantee of scientific correctness. Generated programs still require review, and release readiness, evaluation across representative VTK tasks, security boundaries, and public deployment remain continuing work.

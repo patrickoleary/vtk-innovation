@@ -1,0 +1,11 @@
+# Executive Summary
+
+The Aim 3 ontology work creates a machine-readable representation of how VTK classes participate in visualization pipelines. In 2026 the work was separated into three coordinated repositories: `vtk-python-examples` for executable evidence, `vtk-python-api` for version-specific API extraction, and `vtk-ontology` for semantic definitions, DSL mapping, corpus analysis, and knowledge graphs.
+
+The examples repository contains a generated corpus of 2,259 records plus source, metadata, images, shared data, a VitePress gallery, and screenshot regression tests. The API repository discovers classes from `vtkmodules`, parses Python help, filters non-user-facing types, extracts semantic methods, and enriches the result with ontology metadata; the current local snapshot contains 2,972 class records. The ontology maps approximately 2,000 VTK classes across 16 phases. Its current artifacts include 322 ontology records and 1,988 per-VTK mappings.
+
+The repositories form a reproducible data loop. Examples publish `data.jsonl` for ontology parsing. The ontology returns `experiments.jsonl` to drive DSL and event views in the example gallery and distributes `ontology_per_vtk.jsonl` to enrich API records. Structural graphs describe declared phase, group, class, property, requirement, and I/O relationships. Empirical graphs record what parsed examples actually do. Probability graphs weight alternatives by observed corpus frequency.
+
+This structured layer supports VTK-Prompt and VTK-MCP by translating requests into an ordered DSL, constraining compatible pipeline choices, ranking observed patterns, and linking generated recommendations to executable evidence and exact API records. It also supports documentation, example discovery, ontology audits, and future graph-aware retrieval.
+
+The work remains a developing knowledge system. The ontology is curated rather than exhaustive; corpus probabilities reflect example selection, not scientific validity; API artifacts must remain aligned with VTK versions; and the `vtk-python-api` local snapshot does not yet establish a public release history.

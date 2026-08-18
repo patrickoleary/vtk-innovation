@@ -2,7 +2,7 @@
 
 VTK has spent decades growing into one of the most capable medical and scientific visualization libraries available. That history is an advantage: applications can draw on mature algorithms, data models, interaction styles, and rendering techniques. It is also a deployment challenge. The traditional VTK application assumes a native executable, a local graphics stack, and software that must be installed and maintained on every machine.
 
-VTK-WASM (see vtk-wasm [website](https://kitware.github.io/vtk-wasm/)) changes that relationship. By compiling VTK's C++ implementation to WebAssembly, it brings the toolkit into a browser while preserving the pipeline and object model that VTK users already understand. During 2025 and 2026, the work moved beyond proving that VTK could run on the web. It introduced standalone and remote sessions, a usable JavaScript package, WebGL and WebGPU selection, 32- and 64-bit runtimes, generated API documentation, lifecycle management, and end-to-end validation through trame-vtklocal (see the vtk-wasm [repository](https://github.com/Kitware/vtk-wasm)).
+VTK-WASM (see vtk-wasm [website](https://kitware.github.io/vtk-wasm/)) changes that relationship. By compiling VTK's C++ implementation to WebAssembly, it brings the toolkit into a browser while preserving the pipeline and object model that VTK users already understand. During 2025 and 2026, the work moved beyond proving that VTK could run on the web. It introduced standalone and remote sessions, a usable JavaScript package, WebGL and WebGPU selection, 32- and 64-bit runtimes, generated API documentation, lifecycle management, 16-bit medical textures on the GLES3/WebGL path, and end-to-end validation through trame-vtklocal (see the vtk-wasm [repository](https://github.com/Kitware/vtk-wasm)).
 
 ## 1. The Challenge
 
@@ -16,7 +16,7 @@ Compiling VTK was only the first step. The larger challenge was making compiled 
 
 The implementation now has three cooperating layers.
 
-First, VTK is built with Emscripten into a WebAssembly binary and JavaScript glue. Core changes adapted canvas handling, interaction, object marshaling, serialization, and testing to browser execution. The VTK 9.6 line established generated JavaScript wrappers, standalone and remote sessions, WebGL/WebGPU runtime selection, and wasm64 packages. The VTK 9.7-era work unified asynchronous invocation, improved ownership and finalization, restored Linux WASM testing, and emitted machine-readable type information.
+First, VTK is built with Emscripten into a WebAssembly binary and JavaScript glue. Core changes adapted canvas handling, interaction, object marshaling, serialization, and testing to browser execution. The VTK 9.6 line established generated JavaScript wrappers, standalone and remote sessions, WebGL/WebGPU runtime selection, and wasm64 packages. The VTK 9.7-era work unified asynchronous invocation, improved ownership and finalization, restored Linux WASM testing, emitted machine-readable type information, and added signed and unsigned 16-bit textures for medical data on GLES3/WASM.
 
 Second, [`@kitware/vtk-wasm`](https://github.com/Kitware/vtk-wasm) provides the JavaScript-facing product layer. Its 2.x API starts with `loadAsync()`, which loads and caches a runtime for a selected bundle, graphics backend, and execution mode. That runtime creates either:
 
@@ -90,7 +90,9 @@ await interactor.start();
 // runtime.dispose();
 ```
 
-Changing the load options to `rendering: "webgpu"` selects the modern renderer and automatically requires asynchronous execution in supported browsers. For a Python-driven application, the same runtime can instead create a remote session and hydrate the scene from object states and binary blobs supplied by trame.
+Changing the load options to `rendering: "webgpu"` selects the modern renderer and automatically requires asynchronous execution in supported browsers. VTK-WASM then exercises the same WebGPU backend used by native VTK, including its explicit surface, device, texture, render-pass, and finalization lifecycle. Recent backend work added 2D image mapping, skybox projections, repeated-geometry batching, physically based shading, all VTK light types, and a corrected depth/stencil attachment format. Moving VTK's public WebGPU interfaces from Dawn's C++ wrapper to the WebGPU C API also reduces implementation coupling and better aligns native and Emscripten builds.
+
+Feature status still matters. Signed and unsigned 16-bit textures now enable CT and MRI volume rendering through the GLES3/WebGL WASM path. The WebGPU volume mapper, however, remained under active development in the August 3, 2026 project snapshot, and trame-vtklocal treated WebGPU volume configurations as expected failures. Applications should select a backend according to the mapper coverage they require rather than assuming that `webgl` and `webgpu` are interchangeable. For a Python-driven application, either supported runtime can create a remote session and hydrate the scene from object states and binary blobs supplied by trame.
 
 ## 4. Why This Matters?
 
@@ -98,10 +100,10 @@ VTK-WASM makes the browser a first-class VTK deployment target. A visualization 
 
 The architectural value is just as important. VTK-WASM reuses VTK's C++ algorithms instead of creating another partial port. Fixes and new capabilities in the core can flow into browser builds. JavaScript developers gain direct access to those capabilities, while Python and trame users can keep their existing pipelines and use trame-vtklocal as the delivery layer.
 
-This work also provides a real proving ground for VTK's modernization. Multi-view browser applications expose ownership errors, serialization gaps, event-loop assumptions, and resource leaks quickly. The resulting fixes improve the underlying toolkit, not only its web packaging.
+This work also provides a real proving ground for VTK's modernization. Multi-view browser applications expose ownership errors, serialization gaps, event-loop assumptions, depth-format mismatches, and resource leaks quickly. The resulting fixes improve the underlying toolkit, not only its web packaging. The same is true in the other direction: improvements to WebGPU mappers, shaders, and render passes become available to browser applications as soon as their WASM builds and validation matrix support them.
 
 ## 5. Conclusion
 
 VTK-WASM began as a way to compile VTK for a browser. It has become a runtime, session, serialization, packaging, and testing architecture for using VTK on the web.
 
-The important outcome is continuity. A developer can move from native C++, to JavaScript in a browser, to a Python-controlled trame application without abandoning the VTK pipeline model. The browser becomes another place where VTK runs, not a separate visualization ecosystem that must be rebuilt feature by feature.
+The important outcome is continuity. A developer can move from native C++, to JavaScript in a browser, to a Python-controlled trame application without abandoning the VTK pipeline model. The browser becomes another place where VTK runs, not a separate visualization ecosystem that must be rebuilt feature by feature. That continuity now includes a clearer contract: WebGL remains the stronger path for 16-bit volume rendering today, while WebGPU is the modern shared backend whose feature coverage is being completed and tested incrementally.

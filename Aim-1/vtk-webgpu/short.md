@@ -21,6 +21,8 @@ Legacy VTK render-window classes combined platform windows and graphics contexts
 
 [VTK !12360](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12360) is the key native-window/WebGPU integration change. It established hardware-window implementations and extended the backend beyond the earlier SDL/browser experiments.
 
+`QVTKWebGPUWidget` applies this structure to Qt-owned windows. It is conditional on `VTK_ENABLE_WEBGPU`, uses native-surface handling rather than transferring window ownership to VTK, and has dedicated image-baseline tests on supported platforms.
+
 ## 2026 Rendering progress
 
 Selected implementation changes illustrate the 2026 direction:
@@ -33,19 +35,21 @@ Selected implementation changes illustrate the 2026 direction:
 | [VTK !13117](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13117) | Batching of identical polydata |
 | [VTK !13377](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13377) | WebGPU finalization coordinated with VTK-WASM lifecycle |
 
-The broader work also includes VTK light types, resize correctness, physically based rendering, image slices, render passes, and volume rendering. The exact level of feature parity varies by mapper and platform.
+The broader work also includes all VTK light types, resize correctness, physically based rendering, image slices, render passes, and volume rendering. Skybox work covers equirectangular and cubemap projections in WGSL. Alignment around `DEPTH_24_PLUS_8_STENCIL` corrected depth/stencil mismatches that caused artifacts and premature compute-shader exits across render and compute passes. A draft Slang prototype is exploring shader substitution, reflection, runtime inspection, and debugging while continuing to target WGSL. The exact level of feature parity varies by mapper and platform.
 
 ## Portability and implementation boundary
 
-On native systems, Dawn translates WebGPU operations to Vulkan, Metal, or Direct3D. In WebAssembly builds, browser WebGPU supplies the implementation. VTK is pursuing the standardized WebGPU C API to reduce dependence on Dawn's C++ wrapper and its release-specific types.
+On native systems, Dawn translates WebGPU operations to Vulkan, Metal, or Direct3D. In WebAssembly builds, browser WebGPU supplies the implementation. VTK's public headers have completed the transition from Dawn's `webgpu_cpp.h` wrapper to the standardized WebGPU C API. Dawn-specific and implementation-specific types are no longer exposed publicly, downstream consumers no longer require C++20 for these interfaces, and native builds can load implementations dynamically through dlopen-based proc tables.
 
 This abstraction is a portability decision. Specialized software may still need direct access to native APIs for unique extensions or maximum platform-specific tuning. For the broad VTK community, the common API can reduce duplicated engineering and provide performance within the portable feature envelope.
 
 ## Validation and remaining work
 
-WebGPU is tested through VTK image regression, native Linux Dawn configurations, WASM/browser builds, and trame-vtklocal's end-to-end WebGPU cases. Cross-platform GPU CI remains harder than CPU-only testing because runners need compatible hardware, drivers, and headless-browser configuration.
+WebGPU is tested through VTK image regression, native Dawn configurations, WASM/browser builds, and trame-vtklocal's end-to-end WebGPU cases. Native jobs expanded beyond Linux to macOS and Windows on x86_64 and arm64, although flaky Windows jobs were later pruned to preserve a reliable signal. Cross-platform GPU CI remains harder than CPU-only testing because runners need compatible hardware, drivers, and headless-browser configuration.
 
-The main remaining work is completing volume rendering and render passes, extending mapper coverage, strengthening Windows/macOS/Linux CI, benchmarking representative workloads, finalizing the C API transition, and publishing migration guidance for applications with OpenGL-specific overrides.
+Signed and unsigned 16-bit textures now support medical volume workflows on the GLES3/WebGL WASM path. The WebGPU 2D image mapper supports image and slice workflows, but the WebGPU volume mapper remained under active development in the August 3, 2026 snapshot and trame-vtklocal marked those configurations as expected failures.
+
+The main remaining work is completing WebGPU volume rendering and render passes, extending mapper coverage, stabilizing Windows/macOS/Linux CI, benchmarking representative workloads, defining safe multi-threaded WebGPU resource access, and publishing migration guidance for applications with OpenGL-specific overrides.
 
 ## Primary sources
 

@@ -18,7 +18,7 @@ The delivery stack consists of four main elements:
 - **Object manager and serialization:** VTK object graphs are converted into JSON-like states plus hashed binary blobs. Modification times and hashes minimize repeated transfers.
 - **Application integrations:** trame-vtklocal provides the Python-to-browser bridge, while standalone examples and viewers support JavaScript and exported scenes.
 
-The loader selects `webgl` or `webgpu`, `sync` or `async`, and a wasm32 or wasm64 archive. WebGPU requires asynchronous execution. Runtimes are cached by configuration, and multiple distinct configurations can coexist within one JavaScript page.
+The loader selects `webgl` or `webgpu`, `sync` or `async`, and a wasm32 or wasm64 archive. WebGPU requires asynchronous execution. Runtimes are cached by configuration, and multiple distinct configurations can coexist within one JavaScript page. VTK's WebGPU public interfaces now use the standardized C API rather than Dawn's C++ wrapper, reducing toolchain and implementation coupling and aligning the interface used by native and Emscripten builds. Native VTK can load WebGPU implementations through proc tables; browser builds use the Emscripten-provided implementation.
 
 ## 2026 implementation progress
 
@@ -31,12 +31,15 @@ Core VTK changes complemented the package work:
 - [VTK !13380](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13380) restored Linux-hosted WASM tests.
 - [VTK !13431](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13431) generated JSON type manifests and async-suspension information.
 - [VTK !13480](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13480) fixed remote-session corruption and enabled the newer asynchronous execution path.
+- [VTK !13100](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13100) added signed and unsigned 16-bit textures on GLES3/WASM, enabling CT and MRI volume rendering in the browser.
+
+The shared WebGPU backend also expanded beyond its initial polygonal path. Recent work added a 2D image mapper ([VTK !12851](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12851)), projection-specific skybox shaders ([VTK !13111](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13111)), repeated-geometry batching ([VTK !13117](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13117)), physically based shading, and all VTK light types. A depth/stencil format correction restored correct depth-buffer behavior across render and compute passes, and WebGPU finalization now releases resources when a browser view is disposed. A draft Slang prototype is exploring more maintainable shader substitution, reflection, and debugging while still targeting WGSL.
 
 ## Benefits and limitations
 
 VTK-WASM reduces installation barriers, supports local browser interaction, shares C++ behavior across native and web targets, and lets Python applications deliver local rendering through trame. It also creates a reproducible deployment unit: a versioned browser bundle can be associated with a matching VTK wheel and tested as a pair.
 
-The primary limitations are coverage and cost. Only marshaled modules and classes are available to JavaScript or remote reconstruction. WebAssembly bundles remain large compared with ordinary web libraries. Browser support for newer execution features such as JSPI is not universal. WebGPU capabilities are still being completed. wasm64 expands addressability but has different compatibility and observer/ownership considerations. These constraints are explicit engineering boundaries rather than reasons to fork the implementation again.
+The primary limitations are coverage and cost. Only marshaled modules and classes are available to JavaScript or remote reconstruction. WebAssembly bundles remain large compared with ordinary web libraries. Browser support for newer execution features such as JSPI is not universal. WebGL/GLES3 now supports 16-bit medical volume data, but the WebGPU volume mapper remained under active development and trame-vtklocal marked WebGPU volume configurations as expected failures in the August 3, 2026 snapshot. Other WebGPU render-pass and mapper capabilities are also still being completed. wasm64 expands addressability but has different compatibility and observer/ownership considerations. These constraints are explicit engineering boundaries rather than reasons to fork the implementation again.
 
 ## Primary sources
 
@@ -47,3 +50,4 @@ The primary limitations are coverage and cost. Only marshaled modules and classe
 - [Module availability matrix](https://kitware.github.io/vtk-wasm/roadmap/modules.html)
 - [VTK object serialization](https://docs.vtk.org/en/latest/advanced/object_serialization.html)
 - [VTK.wasm and its trame integration](https://www.kitware.com/vtk-wasm-and-its-trame-integration/)
+- [VTK WebGPU technical report](../vtk-webgpu/detailed.md)

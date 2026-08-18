@@ -19,6 +19,7 @@ Core VTK changes complemented the package work:
 - [VTK !13380](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13380) restored Linux-hosted WASM tests.
 - [VTK !13431](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13431) generated JSON type manifests and async-suspension information.
 - [VTK !13480](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13480) fixed remote-session corruption and enabled the newer asynchronous execution path.
+- [VTK !13100](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13100) added signed and unsigned 16-bit textures to the GLES3/WASM rendering path, enabling volume rendering of CT and MRI data that is typically stored as 16-bit integers.
 
 ## 2. Execution and rendering configurations
 
@@ -34,6 +35,12 @@ The runtime loader treats deployment choices as an explicit configuration:
 `loadAsync()` returns a `VtkWasmRuntime`. The loader caches runtimes by URL, base name, rendering backend, and execution mode. A caller requesting the same configuration receives the shared runtime, while a caller requesting another configuration receives a compatible second runtime. This replaced earlier assumptions that one page would contain one global VTK module.
 
 The wasm32 and wasm64 packages serve different workloads. wasm32 is smaller and more broadly compatible, while wasm64 supports larger address spaces. Both still operate within browser and Emscripten constraints. Runtime selection lets an application make that tradeoff without changing its VTK pipeline.
+
+### Relationship to the shared WebGPU backend
+
+Selecting `webgpu` does not activate a browser-only renderer. VTK-WASM exercises the same `vtkWebGPURenderWindow`, mapper, WGSL shader, and render-pass architecture used by native VTK. The browser hardware window supplies the canvas surface, while the render window owns the adapter, device, queues, attachments, commands, and presentation resources. The finalization work in [VTK !13377](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13377) connects that graphics lifecycle to VTK-WASM session disposal so removing a view releases renderer resources safely.
+
+VTK's public WebGPU headers have moved from Dawn's `webgpu_cpp.h` wrapper to the standardized WebGPU C API. That change removes Dawn-specific types and the C++20 requirement from VTK's public interface, reducing downstream coupling and aligning native and Emscripten integrations around the same API boundary. Native builds can use dlopen-based proc tables to select an implementation at runtime; browser builds use the WebGPU implementation supplied through Emscripten.
 
 ## 3. Session model
 
@@ -102,18 +109,32 @@ The current end-to-end matrix includes:
 
 - WebGL with wasm32 and wasm64;
 - synchronous and asynchronous execution;
-- WebGPU with asynchronous wasm32 and wasm64;
+- WebGPU with asynchronous wasm32 and wasm64, with unsupported volume configurations recorded as expected failures;
 - geometry changes after initial rendering;
 - mount, unmount, and remount behavior;
 - multiple views and shared sessions;
-- volume-rendering paths where supported; and
+- volume-rendering paths, including 16-bit GLES3/WebGL volume rendering for medical imaging data; and
 - Linux, macOS, and Windows browser runners.
 
 This downstream validation has already found core ownership, mapper serialization, interactor mapping, and finalization problems. It is increasingly useful as a contract test for nightly VTK wheels and WASM archives.
 
+The WebGPU backend has its own native image-regression and platform matrix. Coverage expanded to Windows and macOS, including x86_64 and arm64, although flaky Windows jobs were later pruned to preserve a reliable signal. Browser end-to-end tests and native backend tests therefore complement one another; neither alone establishes cross-platform feature parity.
+
+### Rendering feature status
+
+| Area | August 3, 2026 status | VTK-WASM implication |
+|---|---|---|
+| 16-bit medical textures | Signed and unsigned textures supported on GLES3/WASM | CT and MRI volume data can render through the WebGL path |
+| WebGPU images | 2D image mapper added in [VTK !12851](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12851) | Establishes browser-side image and slice workflows |
+| WebGPU polygonal rendering | Skyboxes, repeated-geometry batching, physically based shading, and all VTK light types added | More native scenes can use the WebGPU runtime without falling back |
+| WebGPU depth and passes | Depth/stencil formats aligned across render and compute passes | Corrects artifacts and premature compute-shader exits |
+| WebGPU volume rendering | Mapper still under active development; trame-vtklocal configurations expected to fail | Use WebGL/GLES3 for validated 16-bit volume workflows until coverage is merged and tested |
+
+WGSL pipeline variants remain a maintenance concern as features grow. A draft Slang prototype is exploring shader substitution, runtime inspection, reflection, and debugging while retaining WGSL as the WebGPU target. This is exploratory work rather than a current VTK-WASM requirement.
+
 ## 8. Status, risks, and future work
 
-VTK-WASM is now usable as a product layer, but its maturity is uneven across modules. Core rendering and common scene types are the strongest paths. Specialized filters, widgets, custom modules, and less frequently serialized classes may require additional marshaling work.
+VTK-WASM is now usable as a product layer, but its maturity is uneven across modules and rendering backends. Core rendering and common scene types are the strongest paths. Volume rendering with 16-bit textures on the GLES3/WebGL path now supports CT and MRI data in desktop and mobile browsers. The WebGPU volume mapper remained under active development in the August 3, 2026 snapshot, so WebGPU volume configurations were still expected failures. Specialized filters, widgets, custom modules, and less frequently serialized classes may require additional marshaling work.
 
 Near-term priorities include:
 
@@ -122,6 +143,7 @@ Near-term priorities include:
 - reducing bundle size and improving shared-library/module-loading strategies;
 - strengthening VTK-to-trame nightly contract tests;
 - improving volume, widget, text, scalar-bar, and multi-view coverage;
+- completing WebGPU volume, render-pass, and cross-platform coverage;
 - tracking browser support for asynchronous WebAssembly features; and
 - documenting when to choose VTK-WASM, vtk.js, server rendering, or a hybrid.
 
@@ -129,7 +151,7 @@ The long-term success criterion is not merely that examples render. It is that a
 
 ## 9. Conclusion
 
-VTK-WASM is the browser delivery architecture for compiled VTK. It combines Emscripten builds, JavaScript proxies, runtime and session management, object serialization, canvas integration, and cross-project testing. The 2026 work transformed it from a collection of WebAssembly capabilities into a clearer application model that supports standalone JavaScript and server-driven Python workflows.
+VTK-WASM is the browser delivery architecture for compiled VTK. It combines Emscripten builds, JavaScript proxies, runtime and session management, object serialization, canvas integration, and cross-project testing. The 2026 work transformed it from a collection of WebAssembly capabilities into a clearer application model that supports standalone JavaScript and server-driven Python workflows. Its shared WebGPU backend and standardized C API now connect browser deployment more directly to VTK's native renderer modernization, while explicit feature-status guidance keeps WebGL volume support distinct from the still-developing WebGPU volume path.
 
 ## Primary sources
 
@@ -143,4 +165,8 @@ VTK-WASM is the browser delivery architecture for compiled VTK. It combines Emsc
 - [VTK WebAssembly test-suite architecture](https://docs.vtk.org/en/latest/design_documents/WebAssemblyTestSuiteArchitecture.html)
 - [VTK 9.6.0](https://www.kitware.com/vtk-9-6-0/)
 - [VTK.wasm and its trame integration](https://www.kitware.com/vtk-wasm-and-its-trame-integration/)
-
+- [VTK WebGPU technical report](../vtk-webgpu/detailed.md)
+- [VTK !12851: WebGPU 2D image mapping](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12851)
+- [VTK !13100: 16-bit GLES3/WASM textures](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13100)
+- [VTK !13111: WebGPU skybox rendering](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13111)
+- [VTK !13117: WebGPU polydata batching](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13117)

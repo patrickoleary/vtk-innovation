@@ -25,7 +25,7 @@ This breadth explains why the release article was followed by several narrower p
 
 ### VTK 9.6.1
 
-The first patch release focused on corrections and stabilization. PBR image-based lighting gained multiple-scattering energy compensation so rough metals did not appear artificially dark. WebGL/GLES framebuffer behavior was corrected. EGL and OpenGL initialization messages became more accurate. Array conversions, image batching, renderer changes, Qt key mappings, big-endian math text, and post-processing passes received fixes.
+The first patch release focused on corrections and stabilization. PBR image-based lighting gained multiple-scattering energy compensation so rough metals did not appear artificially dark. WebGL/GLES framebuffer behavior was corrected. EGL and OpenGL initialization messages became more accurate. Additional fixes addressed out-of-bounds and overflow guards for merge-cells access, integer overflow for large images, and a selector cell-id high-24-bit segfault. Stencil depth was preserved in `vtkSSAAPass`, UBSan lighting issues in skybox rendering were resolved, and GLSL volume-shader type mismatches were corrected. Array conversions, image batching, renderer changes, Qt key mappings, big-endian math text, and post-processing passes also received fixes.
 
 The patch demonstrates why release communication should distinguish architectural milestones from adoption work. A user may notice the release primarily because a renderer no longer crashes or emits an incorrect warning, even though those changes are less likely to headline a blog post.
 
@@ -33,11 +33,11 @@ The patch demonstrates why release communication should distinguish architectura
 
 The May patch release improved incremental serialization by skipping arrays whose modification time was older than the recorded state. This directly supported VTK-WASM and trame-vtklocal scenes containing many unchanged arrays.
 
-Other fixes covered null `vtkPoints` in point-cloud conversion, HyperTreeGrid concurrency and performance, DICOM scientific notation, low-CPU Win32 idle behavior, floating-point boundary colors, and SSAA across multiple viewports. The collection reinforces the cross-project character of modern VTK releases: browser synchronization, desktop interaction, medical metadata, parallel processing, and rendering can all be present in one patch line.
+Other fixes covered null `vtkPoints` in point-cloud conversion, HyperTreeGrid concurrency and performance, DICOM scientific notation, low-CPU Win32 idle behavior, floating-point boundary colors, SSAA across multiple viewports, `vtkExtractVOI` origin handling with custom sample rates, GDAL const conversions, `vtkGLTFImporter` observer guarding, and GLTF unrecognized-image-type loading with object-name export improvements. An NVIDIA Vulkan/X11 workaround diagnosed and resolved X11 Display corruption with the NVIDIA Vulkan driver. Camera bounds-reset fixes, hardware selection for `vtkOpenGLImageSliceMapper`, and `vtkScalarBarActor` tick-label respect were also included. The collection reinforces the cross-project character of modern VTK releases: browser synchronization, desktop interaction, medical metadata, parallel processing, and rendering can all be present in one patch line.
 
 ### VTK 9.7 candidates
 
-The 9.7 branch split on June 27. RC1 followed immediately, RC2 was tagged by July 17, and RC3 on July 28. The published schedule moved several times as candidates and wheels required more testing, eventually targeting August 3 for the final release.
+The 9.7 branch split on June 27. RC1 followed immediately, RC2 was tagged by July 17, RC3 on July 28, and RC4 extended the cycle to August 4. The published schedule moved several times as candidates and wheels required more testing. Release planning threads on Discourse—covering 9.6.0, 9.6.1, 9.6.2, and jointly VTK 9.7.0 and 10.0.0—drove community coordination throughout the cycle. A notable cross-version communication announced the removal of `<iostream>` from core headers, and the release/master merge cadence and nightly date-stamp process were actively managed throughout.
 
 The planning post positioned VTK 9.7 as the opt-in WebGPU evaluation release ahead of a possible VTK 10 default-backend change. That makes candidate feedback especially important. Applications with custom OpenGL behavior, advanced render passes, volumes, or unusual platform configurations need a stable checkpoint in which to test the new backend without losing the established default.
 
@@ -131,6 +131,10 @@ Tasks involved scalar-bar labels, quadratic-triangle gradients, 16-bit WASM volu
 
 More than 15 merge requests were opened during the event. The published next step was explicit: review and merge them. This matters because hackathon output should be judged by later integration and test stability, not only by the number of branches created during the day.
 
+### Sustained community support
+
+Beyond the hackathon, consistent monthly support on Discourse covered volume rendering, `vtkMultiVolume`, QVTK performance, image slicing, edge-appearance regressions, and ParaView integration questions. This ongoing engagement complements the concentrated hackathon effort and keeps the community informed between releases.
+
 ## 6. Proposed VTK Days
 
 ### Purpose
@@ -178,6 +182,10 @@ WebGPU changes rendering architecture. VTK-WASM changes deployment. Python notat
 
 The polyhedron work removes serial fallbacks. The vertex-pulling study questions the need for two mappers. MTime serialization avoids unnecessary work. Each can improve performance while also reducing special cases, duplicate code, or repeated transfers.
 
+### Ray tracing modernization complements the rendering transition
+
+Alongside the WebGPU migration, the ray-tracing stack received significant attention. ANARI material-library support and device-lifecycle fixes improved the scene-graph layer. OSPRay material-library code was deprecated and cleaned up, with a matching ParaView material-library query fix. ParaView Superbuild integration brought ANARI-SDK and VisRTX together, and ANARI on macOS via helide dropped the OSPRay dependency entirely. A public Discourse discussion on the VTK ray-tracing roadmap (ANARI/VisRTX/OptiX) was opened with NVIDIA. These changes ensure that VTK’s rendering modernization extends beyond rasterization.
+
 ### Patch releases are part of adoption
 
 Features become usable through corrections to event loops, memory ownership, metadata parsing, render passes, packaging, and platform behavior. The 9.6.1 and 9.6.2 lines should be part of the public story, even when feature articles naturally emphasize 9.6.0.
@@ -198,9 +206,11 @@ Several areas deserve continued attention:
 - roadmaps should distinguish merged capabilities from work in progress, particularly WebGPU volume rendering and render passes;
 - VTK.js and VTK-WASM need clear selection guidance;
 - performance articles should continue publishing hardware, dataset, settings, and comparison limitations;
-- hackathon merge requests need later status tracking; and
-- VTK Days should not be described as scheduled or completed until a public date, agenda, or event record exists;
+- hackathon merge requests need later status tracking;
+- VTK Days should not be described as scheduled or completed until a public date, agenda, or event record exists; and
 - the move toward VTK 10 needs migration guidance for custom OpenGL code and downstream projects.
+
+Infrastructure improvements have strengthened several of these areas. The Doxygen versioned-documentation system now includes a version-selector dropdown, DOM detection, a backfill script for historical versions, and multiple fixes to the documentation-upload pipeline (missing rsync, restricted-shell access, TOC generation, and ReadTheDocs TOC skip). The ghostflow-director merge bot received image-trailer splicing fixes, `.png.sha256` image embedding in MR descriptions, trailer/blank-line preservation, Cargo security-vulnerability bumps, and CI upkeep. Dawn version configuration was refactored and bumped in ci-utilities. UNIX line endings were enforced for markdown, and generation dates were added to the artifacts inventory.
 
 ## 9. Items to watch after August 3, 2026
 
@@ -215,9 +225,9 @@ Several areas deserve continued attention:
 
 ## 10. Conclusion
 
-VTK's 2026 releases, technical articles, hackathon, and VTK Days planning form a coherent project and community strategy. VTK 9.6 delivered a wide technical baseline and two corrective releases. The blog series taught users how that work affects languages, notebooks, browsers, rendering, and performance. The hackathon reduced backlog and platform friction while assigning longer-running reliability work. The VTK Days concept extended that momentum toward recognition, presentations, recruitment, and collaborative development. The 9.7 candidates prepared the next technical evaluation point ahead of VTK 10.
+VTK’s 2026 releases, technical articles, hackathon, and VTK Days planning form a coherent project and community strategy. VTK 9.6 delivered a wide technical baseline, followed by two corrective releases that addressed rendering correctness, out-of-bounds guards, platform-specific driver workarounds, and GLTF interoperability. The blog series taught users how that work affects languages, notebooks, browsers, rendering, and performance. The hackathon reduced backlog and platform friction while assigning longer-running reliability work. Sustained Discourse engagement maintained community support between events. Ray-tracing modernization through ANARI, VisRTX, and helide extended the rendering transition beyond rasterization. Versioned Doxygen documentation, merge-bot improvements, and CI toolchain updates strengthened developer infrastructure. The VTK Days concept extended that momentum toward recognition, presentations, recruitment, and collaborative development. The 9.7 release candidates—spanning rc1 through rc4—prepared the next technical evaluation point ahead of VTK 10.
 
-The most important result is the cycle itself: stable releases, honest technical explanation, concentrated maintenance, and feedback-driven candidates. That cycle allows a mature open-source toolkit to modernize while preserving the reliability and community knowledge that made it valuable.
+The most important result is the cycle itself: stable releases, honest technical explanation, concentrated maintenance, infrastructure investment, and feedback-driven candidates. That cycle allows a mature open-source toolkit to modernize while preserving the reliability and community knowledge that made it valuable.
 
 ## Primary sources
 

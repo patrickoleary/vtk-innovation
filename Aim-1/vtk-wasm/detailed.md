@@ -19,6 +19,7 @@ Core VTK changes complemented the package work:
 - [VTK !13380](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13380) restored Linux-hosted WASM tests.
 - [VTK !13431](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13431) generated JSON type manifests and async-suspension information.
 - [VTK !13480](https://gitlab.kitware.com/vtk/vtk/-/merge_requests/13480) fixed remote-session corruption and enabled the newer asynchronous execution path.
+- 16-bit texture support in the GLES3/WASM rendering path enabled full volume rendering of medical imaging data (CT, MRI) that is typically stored as 16-bit integers, removing a key limitation for browser-based volume visualization.
 
 ## 2. Execution and rendering configurations
 
@@ -106,14 +107,14 @@ The current end-to-end matrix includes:
 - geometry changes after initial rendering;
 - mount, unmount, and remount behavior;
 - multiple views and shared sessions;
-- volume-rendering paths where supported; and
+- volume-rendering paths, including 16-bit GLES volume rendering for medical imaging data; and
 - Linux, macOS, and Windows browser runners.
 
 This downstream validation has already found core ownership, mapper serialization, interactor mapping, and finalization problems. It is increasingly useful as a contract test for nightly VTK wheels and WASM archives.
 
 ## 8. Status, risks, and future work
 
-VTK-WASM is now usable as a product layer, but its maturity is uneven across modules. Core rendering and common scene types are the strongest paths. Specialized filters, widgets, custom modules, and less frequently serialized classes may require additional marshaling work.
+VTK-WASM is now usable as a product layer, but its maturity is uneven across modules. Core rendering and common scene types are the strongest paths. Volume rendering with 16-bit textures on the GLES3/WASM path now supports CT and MRI data in desktop and mobile browsers. Specialized filters, widgets, custom modules, and less frequently serialized classes may require additional marshaling work.
 
 Near-term priorities include:
 

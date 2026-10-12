@@ -27,6 +27,10 @@ The architecture reports 25 tools, but its function inventory names 24: 17 knowl
 - Added a command-line path as well as MCP access, reducing protocol lock-in.
 - Connected VTK-Prompt to the service and demonstrated a shared internal deployment with self-hosted models.
 - Defined continuous-integration and container flows for versioned knowledge, index, and server artifacts.
+- Published a pre-built embedded Qdrant artifact (`vtk-index` image) and added `vtk-knowledge download` and `from_artifact()` loading from a ghcr.io OCI image, so the server no longer builds its index at startup.
+- Fixed the published index lacking the `vtk_code` collection (example search failed with "Collection vtk_code not found"): `vtk-index chunk --with-code` now fetches and chunks the `vtk-examples` Python sources, and the build workflow fails if `vtk_docs` or `vtk_code` is missing or empty. The published `9.6.1-embedded` artifact still needs to be rebuilt.
+- Added the `translate_prompt_to_dsl` and `is_dsl_prompt` tools, then fixed a deployed crash caused by a missing `litellm` dependency.
+- Changed `translate_prompt_to_dsl` (October 2026) to stop calling an LLM from the server: it returns the DSL grammar plus relevant VTK class context and the calling assistant writes the DSL. The server no longer needs its own model or API key, and the `VTK_MCP_TRANSLATE_*` settings were removed.
 
 ## Example workflow
 

@@ -1,0 +1,11 @@
+# Executive Summary
+
+VTK-History measures which maintenance tasks VTK's own development history can support, and builds tools for the ones that work. The history is large: 11 years of GitLab merge requests (MRs) and review discussions, 8 years of Discourse forum threads, and 32 years of commits. Today it is used only by the people who remember it. The project mirrors all of it locally (13,759 MRs, 5,193 issues, 55,942 review comments, 7,746 forum topics, 79,907 commits), indexes it for keyword and embedding search, and tests each tool by replaying past MRs with only the history that existed before each one.
+
+Three uses held up. Searching the history with an MR's title and description put the issue it fixes in the top 5 of about 3,700 issues for 84% of 300 MRs. Suggesting reviewers from recent reviews and commits on the changed files put an actual reviewer in the top 3 for 76% of 1,656 MRs, against 67% for the three most active reviewers. Follow-through estimates for 217 review conventions predicted whether an author would act on a new comment better than the overall rate (Brier score 0.194 against 0.218). In addition, 25 conventions, behind 15% of convention comments, match clang-tidy checks VTK does not enable.
+
+Three uses did not. AI review agents (a local model and gpt-5.4-mini) raised the same concern as a VTK reviewer for about 1 comment in 25; for scale, two VTK reviewers on the same MR comment within 5 lines of each other only 10 to 17% of the time. File history did not predict which convention a reviewer would raise. Given a reviewer's comment, gpt-5.4-mini wrote an acceptable fix for 53% of 150 comments, and examples drawn from the history did not improve that.
+
+The working tool is an MR briefing in a trame app. In about 4 seconds it gathers related issues, MRs and forum threads, suggested reviewers, conventions applied to the changed files, deprecated APIs in the added code, and recent commits, each labeled with its measured accuracy. The history's measured value today is in giving people context and in providing an answer key for evaluating AI tools on VTK. Next steps are pilots of issue triage and reviewer routing with VTK maintainers, a module coverage map, and a proposal to enable the matching clang-tidy checks.
+
+Code: [github.com/jlee-kitware/vtk-history](https://github.com/jlee-kitware/vtk-history).

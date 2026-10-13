@@ -56,7 +56,7 @@ Spatial visualization of explainability, sensitivity, and uncertainty, including
 
 ## Aim 3: Enhanced Community Support
 
-The 2026 Aim 3 work now has three connected layers: an authoring experience, a reusable knowledge service, and a structured data/ontology pipeline. Meeting files named “Aim #3 catch up” sometimes contain both Aim 2 and Aim 3 updates; the reports separate the topics by technical workstream.
+The 2026 Aim 3 work now has three connected layers: an authoring experience, a reusable knowledge service, and a structured data/ontology pipeline. VTK-History adds VTK's development history (merge requests, review discussions, issues, forum threads and commits) and measures which maintenance tasks it supports. Meeting files named “Aim #3 catch up” sometimes contain both Aim 2 and Aim 3 updates; the reports separate the topics by technical workstream.
 
 ### VTK-Prompt
 
@@ -75,6 +75,12 @@ The modular knowledge, hybrid retrieval, API validation, and DSL service behind 
 [Blog](./Aim-3/vtk-ontology/blog.md) · [Executive summary](./Aim-3/vtk-ontology/summary.md) · [Short report](./Aim-3/vtk-ontology/short.md) · [Detailed report](./Aim-3/vtk-ontology/detailed.md)
 
 The three-repository knowledge pipeline spanning [`vtk-python-examples`](https://github.com/patrickoleary/vtk-python-examples), `vtk-python-api`, and `vtk-ontology`: executable evidence, enriched API records, a 16-phase ontology, pipeline DSL, and structural, empirical, and probability graphs.
+
+### VTK-History
+
+[Blog](./Aim-3/vtk-history/blog.md) · [Executive summary](./Aim-3/vtk-history/summary.md) · [Short report](./Aim-3/vtk-history/short.md) · [Detailed report](./Aim-3/vtk-history/detailed.md)
+
+A local mirror and index of VTK's public development history, tools for issue triage, reviewer suggestions, MR briefings and review conventions, and measurements of each against past merge requests, including where AI review did not match VTK's reviewers. Code: [`vtk-history`](https://github.com/jlee-kitware/vtk-history).
 
 ## VTK releases and community activity
 

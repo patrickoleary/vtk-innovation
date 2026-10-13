@@ -116,6 +116,16 @@ export default defineConfig({
               { text: 'Detailed report', link: '/Aim-3/vtk-ontology/detailed' },
             ],
           },
+          {
+            text: 'VTK-History',
+            collapsed: true,
+            items: [
+              { text: 'Blog', link: '/Aim-3/vtk-history/blog' },
+              { text: 'Executive summary', link: '/Aim-3/vtk-history/summary' },
+              { text: 'Short report', link: '/Aim-3/vtk-history/short' },
+              { text: 'Detailed report', link: '/Aim-3/vtk-history/detailed' },
+            ],
+          },
         ],
       },
       {

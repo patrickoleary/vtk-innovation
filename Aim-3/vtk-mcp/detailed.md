@@ -70,6 +70,8 @@ After assembly, the validator checks calls such as `AddInputData()` and `Update(
 
 Implemented or demonstrated work includes component separation, a JSONL knowledge layer, hybrid Qdrant retrieval, API and import checks, DSL tools, the reported MCP tool surface, VTK-Prompt integration, local-model tool handling, and an internal containerized deployment path.
 
+Recent changes (through October 2026) include a pre-built embedded Qdrant artifact and OCI-image download for `vtk-knowledge`, a fix that restores the missing `vtk_code` example collection together with a CI completeness check, and a redesign of `translate_prompt_to_dsl` so that it returns grammar and class context for the calling assistant instead of making a nested LLM call. The rebuild and republication of the corrected `9.6.1-embedded` index artifact is still pending. Open dependency-update pull requests remain in `vtk-knowledge` and `vtk-mcp`.
+
 Priority evaluation areas are:
 
 - coverage and accuracy of extracted Python signatures;

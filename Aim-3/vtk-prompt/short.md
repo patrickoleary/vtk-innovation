@@ -27,6 +27,10 @@ The architecture draws on the Sequential Thinking Pipeline, which decomposes a p
 - Connected to a configurable `vtk-mcp` server and added optional agent-driven retrieval.
 - Supported inline textual tool calls from local models without native function calling.
 - Added default-on natural-language-to-DSL translation and a `--debug` record of LLM context, tool calls, and results.
+- Added sample-data resolution from the VTK data store and user-uploaded data files, with a Data settings tab; hardened execution so scripts that call `sys.exit()` no longer stop the server.
+- Made model settings (temperature, max tokens, retry attempts) per-conversation, fixed the temperature clamp for reasoning models, and moved install-wide settings to a persisted `config.yml`.
+- Added bulk actions (pin, unpin, export, delete) in the Recents drawer and call-chain completion for VTK methods that Jedi cannot infer (for example after `GetPointIds().`).
+- Added a `docker-compose.yml` that runs the pre-built `vtk-mcp` image with the web UI, and a CI job that publishes a `vtk-prompt` image to ghcr.io (October 2026). The full compose stack and push job were not yet run end to end.
 
 ## Example workflow
 

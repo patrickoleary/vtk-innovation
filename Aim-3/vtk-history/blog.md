@@ -24,8 +24,10 @@ The history gives people context they would otherwise have to remember or dig fo
 
 We also measured where the history did not help. AI review agents, on a local model and on gpt-5.4-mini, raised the same concern as a VTK reviewer for about 1 comment in 25, with or without the mined conventions. For scale, two VTK reviewers on the same MR comment within 5 lines of each other only 10 to 17% of the time. Given a reviewer's comment, gpt-5.4-mini wrote an acceptable fix about half the time, and examples from the history (similar past comments or earlier changes to the same function) did not improve that.
 
+The history can also fill gaps in the project's own bookkeeping. Only 14% of VTK issues carry an area label such as `area:rendering`. Suggesting labels from the most similar labeled issues was right 95% of the time above a confidence cutoff, and would label 1,394 more issues. The issues it could not label point to parts of VTK, such as filters and the data model, that have no label at all.
+
 Those negative results depend on the history too. Its record of what reviewers asked for and what authors changed is the answer key that made these AI measurements possible, and it can be used to test any AI tool proposed for VTK.
 
 ## 5. Conclusion
 
-VTK's history measurably helps with triage, reviewer routing, and weighing review conventions, and the Briefing tab puts those results in front of a maintainer in seconds with their accuracy labeled. The next steps are pilots of issue triage and reviewer suggestions with VTK maintainers, a module coverage map for planning maintenance, and a proposal to enable the matching clang-tidy checks. The code and evaluation scripts are at [github.com/jlee-kitware/vtk-history](https://github.com/jlee-kitware/vtk-history).
+VTK's history measurably helps with triage, reviewer routing, weighing review conventions, and labeling issues by area, and the Briefing tab puts those results in front of a maintainer in seconds with their accuracy labeled. The next steps are pilots of issue triage and reviewer suggestions with VTK maintainers, a module coverage map for planning maintenance, and a proposal to enable the matching clang-tidy checks. The code and evaluation scripts are at [github.com/jlee-kitware/vtk-history](https://github.com/jlee-kitware/vtk-history).

@@ -26,6 +26,8 @@ For 22,277 comments on specific lines, the extractor recovers the code the comme
 
 The git history is indexed separately: 79,907 non-merge commits on master back to 1994, each with its message, changed files, the functions changed (from diff hunk headers), and the date it landed on master. Merge commits carry a `Merge-request: !N` trailer, which links 25,667 commits (everything merged through GitLab since 2015) to their MR and its review discussion. The landing date matters: 11% of VTK commits landed more than 30 days after they were written, so dating by author date would leak later changes into tests that must use only earlier history.
 
+GitLab labels on issues and MRs are stored with the index, and review threads take the labels of their MR. 1,452 issues carry at least one label and 736 an area label (`area:` followed by a part of VTK).
+
 All text is indexed for keyword search and for embedding search with qwen3-embedding, about 104,000 documents plus the commits. Local models (qwen3-coder-next and gpt-oss:120b) run through Ollama on a DGX Spark.
 
 ## 3. Method
@@ -42,6 +44,7 @@ Every test replays past MRs. Each prediction uses only history from before the M
 | AI review agent | 149 past MRs with reviewer comments | Reviewer comments on the same concern and lines | The same agent without mined conventions |
 | Reviewer agreement | 1,055 MRs with line comments from 2 or more reviewers | Another reviewer's comment within 5 lines | None; reference for the agent |
 | Writing the fix | 150 acted-on line comments from 2023 on, one per MR | The author's change within 3 lines; a judge's verdict | The same model without examples |
+| Area labels | 720 issues with one of the 15 area labels used at least 8 times; 172 filed since 2024 | The issue's own area labels | Always the most common label (`area:build`) |
 
 The judge for agent comments and fixes (gpt-oss:120b) was checked two ways. It rated 73% of real reviewer comments worth posting, and 0% of the same comments when attached to an unrelated MR. Of agent comments it rated worth posting, 41% were on lines the author later changed, against 21% for random changed lines and 15% for comments it rated wrong.
 
@@ -65,6 +68,32 @@ The Brier score is the mean squared error of a predicted probability. Comments o
 **Checks a tool could make.** 25 of the 217 conventions match a clang-tidy check VTK does not enable. Reviewers wrote 217 of the 1,490 convention comments (15%) for them, led by braces on every block (36 comments across two conventions), anonymous namespaces (23), C++-style casts (19) and range-based for loops (19). Another 16 conventions (112 comments) are already enforced by a tool.
 
 **Reviewer agreement.** Of 1,055 MRs with line comments from two or more reviewers, another reviewer commented within 5 lines of a given comment 16.7% of the time, and 10.0% when both comments were on the same revision. A second reviewer often skips a point already made, so this understates independent agreement. It sets the scale for the agent results: agent comments landed within 5 lines of a reviewer's 15 to 20% of the time.
+
+**Area labels.** 736 of 5,193 issues (14%) carry an area label, and 256 of 1,012 open issues (25%). For comparison, 11% of ParaView's last 1,000 issues carry one. The suggester votes from the 15 most similar issues and MRs that already carry an area label, from the directories changed by MRs that link the issue, and from labels on those MRs. Labels that name a technology (`area:wasm`, `area:webgpu`, `area:anari`, `area:vr`, `area:qt`, `area:ray-tracing`, `area:VTKHDF`, `area:serialization`, `area:text`) count only when the issue's title or description names the technology. Their code overlaps with general rendering code: without this check, a desktop point-rendering issue (#17000) drew `area:wasm` votes from WebAssembly fixes to the same mapper. Confidence is the top label's share of the votes.
+
+Two tests on issues maintainers already labeled. Backfill: each labeled issue is treated as unlabeled. New issues: only labels from before 2024, tested on issues filed since, leaving out 91 whose label had fewer than 8 examples before 2024 (`area:webgpu`, `area:VTKHDF` and three small labels), since no method can suggest a label it has not seen.
+
+| Confidence at least | Backfill test: right | New-issue test: right |
+|---|---|---|
+| 0.9 | 97% of 99 | 100% of 11 |
+| 0.8 | 98% of 202 | 96% of 27 |
+| 0.7 | 95% of 315 | 91% of 54 |
+| 0.6 | 93% of 460 | 89% of 87 |
+| 0.5 | 88% of 607 | 84% of 125 |
+| Any | 84% of 720 | 73% of 172 |
+
+Always suggesting `area:build` is right for 42%. By source of evidence, similar issues and MRs alone are right for 86%, the files changed by linked MRs for 61% of the 210 issues that have them, and the labels on linked MRs for 83% of 95. The cutoff is 0.7, the lowest confidence where both tests reach 90%; below it an issue is marked "no label fits".
+
+Applying every suggestion at or above the cutoff would label 1,394 more issues (246 open), raising coverage from 14% to 41% of all issues and from 25% to 50% of open ones. From the precision measured at each confidence level, about 51 of the added labels would be wrong. The largest additions are `area:build` (559), `area:rendering` (500) and `area:io` (173). The 3,063 issues left unlabeled (510 open) are mostly in parts of VTK that no label covers:
+
+| Directory | MRs that changed it | With an area label |
+|---|---|---|
+| Rendering | 3,216 | 6% |
+| Filters | 2,440 | 1% |
+| IO | 2,272 | 3% |
+| Common | 2,251 | 3% |
+
+The same gap shows in a sample of suggestions: filter bugs such as one in `vtkTubeFilter` were labeled `area:rendering`, the nearest label available. A proposed VTK issue template asks reporters for area and language labels; its Language and Graphics backend lines map directly to labels, so the suggester reads them before falling back on similar issues.
 
 ## 5. Results that did not hold up
 
@@ -103,7 +132,7 @@ The similar-comment run differed from no examples by -3 points (95% interval -13
 
 ## 6. The tools
 
-The history is presented in a trame app with six tabs. Every control has a tooltip that says what it does.
+The history is presented in a trame app with seven tabs. Every control has a tooltip that says what it does.
 
 | Tab | What it shows |
 |---|---|
@@ -111,8 +140,9 @@ The history is presented in a trame app with six tabs. Every control has a toolt
 | Review | Suggested reviewers and past review comments for an MR, and the AI review results |
 | Rules | The 217 conventions with their source comments, follow-through level, and matching clang-tidy check |
 | Deprecations | Every API VTK deprecated: when, why, in which MR, and whether it was removed |
-| Trends | Terms, code areas and themes whose share of MRs or forum topics rose or fell |
-| Search | Keyword and embedding search over MRs, issues, review threads, forum posts, blogs, docs and release notes |
+| Trends | Terms, code areas, themes and GitLab labels whose share of MRs, issues or forum topics rose or fell |
+| Labels | The backfill simulation, the accuracy of area label suggestions at each confidence level, the suggestions for each unlabeled issue, and a lookup for one issue |
+| Search | Keyword and embedding search over MRs, issues, review threads, forum posts, blogs, docs and release notes, filterable by GitLab label |
 
 The Briefing tab assembles its sections in about 4 seconds per MR. For a closed MR it uses only history from before the MR was opened, so it shows what was knowable at the time.
 
@@ -136,10 +166,11 @@ The answer keys are conservative. A related issue that the description does not 
 
 - **Issue and forum triage.** Suggest related issues, MRs and forum threads when an issue or topic is opened, piloted with VTK maintainers on open issues.
 - **Reviewer routing.** Suggest reviewers with typical response times when an MR opens, piloted on open MRs.
+- **Area labels.** Propose labels for filters and the data model, have a maintainer review a random sample of about 100 suggestions before any backfill, and mark backfilled labels so later corrections can be counted.
 - **Module coverage map.** Who has recently reviewed or written each module, which modules have one or no active reviewer, and where issue and forum activity is rising.
 - **Clang-tidy checks.** Propose enabling the checks behind the most frequent tool-enforceable conventions, and count review comments on those conventions before and after.
 - **Wider evaluation.** Run the related-history test on every MR that links an issue, and repeat the evaluations on ParaView.
 
 ## 10. Conclusion
 
-VTK's history supports three maintenance tasks with measured accuracy: finding related earlier work, routing MRs to reviewers, and weighing review conventions. It identifies 25 conventions a tool could enforce. It did not make AI review agents or AI fix suggestions match VTK's reviewers more closely. Its measured value today is in giving maintainers context and in providing the answer key for evaluating AI tools on VTK, including the tools in the rest of Aim 3.
+VTK's history supports four maintenance tasks with measured accuracy: finding related earlier work, routing MRs to reviewers, weighing review conventions, and labeling issues by area. It identifies 25 conventions a tool could enforce. It did not make AI review agents or AI fix suggestions match VTK's reviewers more closely. Its measured value today is in giving maintainers context and in providing the answer key for evaluating AI tools on VTK, including the tools in the rest of Aim 3.

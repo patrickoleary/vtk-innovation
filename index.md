@@ -48,6 +48,12 @@ Jaswant Panchumarti is the principal technical lead for Aim 2. The 2026 emphasis
 
 Transfer a reference volume-rendering appearance to a target volume using learned scalar/gradient-to-RGBA mappings, 2D slice losses, 3D Slicer volume-property input, trame delivery, and scientific-data extensions. [AI-TF-slides.pdf](./Aim-2/AI-TF-slides.pdf) provides the latest experiment evidence.
 
+### Flow-feature transfer functions
+
+[Blog](./Aim-2/tf-flow/blog.md) · [Executive summary](./Aim-2/tf-flow/summary.md) · [Short report](./Aim-2/tf-flow/short.md) · [Detailed report](./Aim-2/tf-flow/detailed.md)
+
+Learned per-voxel recirculation, vortex, shear-layer, and wake probabilities from AhmedML velocity and pressure fields, driving a custom four-channel VTK volume-rendering shader in place of hand-tuned Q/λ₂/vorticity thresholds.
+
 ### AI-Data
 
 [Blog](./Aim-2/data/blog.md) · [Executive summary](./Aim-2/data/summary.md) · [Short report](./Aim-2/data/short.md) · [Detailed report](./Aim-2/data/detailed.md)

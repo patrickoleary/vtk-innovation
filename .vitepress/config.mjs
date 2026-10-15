@@ -81,6 +81,16 @@ export default defineConfig({
               { text: 'Detailed report', link: '/Aim-2/data/detailed' },
             ],
           },
+          {
+            text: 'Flow-feature transfer functions',
+            collapsed: true,
+            items: [
+              { text: 'Blog', link: '/Aim-2/tf-flow/blog' },
+              { text: 'Executive summary', link: '/Aim-2/tf-flow/summary' },
+              { text: 'Short report', link: '/Aim-2/tf-flow/short' },
+              { text: 'Detailed report', link: '/Aim-2/tf-flow/detailed' },
+            ],
+          },
         ],
       },
       {

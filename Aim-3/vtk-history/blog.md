@@ -16,6 +16,8 @@ Every capability is tested the same way. We replay past MRs, give the tool only 
 
 !13389 added native Mesa offscreen rendering to VTK's EGL render window. Given only the MR number, the app's Briefing tab gathers in about 4 seconds what the history says about it, using only history from before the MR was opened. It listed !12591, an earlier attempt at the same change, and Mesa offscreen issues going back to 2005. Its top two suggested reviewers were the two people who reviewed the MR. The briefing also lists conventions reviewers have applied to the changed files, deprecated APIs in the added code, and recent commits to those files.
 
+![The Briefing tab for !13389: related issues, MRs and forum topics, suggested reviewers, conventions reviewers applied to these files, deprecated APIs, and recent commits on the changed files](./briefing.png)
+
 The example matches the measured numbers. Over 300 past MRs, the issue an MR fixes was in the top 5 search results, out of about 3,700 issues, 84% of the time. Over 1,656 MRs, an actual reviewer was in the top 3 suggestions 76% of the time, against 67% for simply naming the three most active reviewers.
 
 ## 4. Why This Matters?

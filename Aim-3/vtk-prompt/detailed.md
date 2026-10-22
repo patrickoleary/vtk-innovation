@@ -62,7 +62,7 @@ This workflow is valuable as both an authoring aid and a learning path: users se
 
 ## 8. Status, risks, and next work
 
-Implemented or demonstrated capabilities include the three-panel UI, conversation isolation, concurrent requests, console capture, code completion, data resolution, MCP integration, textual tool calls for local models, DSL translation, and debug records.
+Recent work (through October 2026) adds per-conversation model settings, bulk conversation actions, VTK call-chain completion, uploaded and sample-data resolution, and a docker compose deployment with a published container image. Implemented or demonstrated capabilities include the three-panel UI, conversation isolation, concurrent requests, console capture, code completion, data resolution, MCP integration, textual tool calls for local models, DSL translation, and debug records.
 
 Continuing work includes:
 

@@ -9,3 +9,5 @@ A new thinking stage converts a request into a DSL-like description of filters, 
 This architecture consolidates earlier work on VTK-Prompt, VTK RAG, API-MCP, and the Sequential Thinking Pipeline while preserving a clean boundary: VTK-Prompt is the interactive client; VTK knowledge, retrieval, and validation are services. `trame-llm` remains a related path for controlling registered functions in an existing application by language or voice.
 
 The result is a stronger foundation for AI-supported learning and authoring, not a guarantee of scientific correctness. Generated programs still require review, and release readiness, evaluation across representative VTK tasks, security boundaries, and public deployment remain continuing work.
+
+Recent updates: model settings are now per-conversation, the Recents drawer supports bulk actions, completion works through VTK call chains, users can upload their own data files, and a docker compose setup with a published image runs VTK-Prompt together with the `vtk-mcp` service.
